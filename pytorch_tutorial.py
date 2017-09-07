@@ -68,8 +68,15 @@ class Net(nn.Module):
 # TRAINING
 #
 
-net = Net()
+# Loading/saving taken from https://github.com/pytorch/pytorch/blob/761d6799beb3afa03657a71776412a2171ee7533/docs/source/notes/serialization.rst
+def save_model(model, path):
+    return torch.save(model.state_dict(), path)
 
+def load_model(the_model, path):
+    model_placeholder = torch.load(path)
+    the_model.load_state_dict(torch.load(PATH))
+
+net = Net()
 if torch.cuda.is_available():
     net.cuda()
 
@@ -79,7 +86,8 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 n_epochs = 2
 for epoch in range(n_epochs):
     running_loss = 0.0
-    # TODO When wouldn't you start at 0?
+    # TODO When wouldn't you start at 0? Upon inspection, they appear to be the
+    # same.
     for i,d in enumerate(trainloader, 0):
         inputs, labels = d
         if torch.cuda.is_available():
@@ -101,6 +109,11 @@ for epoch in range(n_epochs):
             running_loss = 0.0
 
 print('Finished Training')
+
+# TODO factor out these paths
+save_model(net, os.path.expanduser("~/results/pytorch-tutorial/foobar"))
+
+# TODO load model
 
 #
 # TEST
